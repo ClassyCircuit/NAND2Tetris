@@ -42,5 +42,44 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+    // makes x zero
+    Not16(in=x, out=notX);
+    And16(a=x, b=notX, out=zeroX);
+    // 'zx' checkpoint (x or zeroed-x)
+    Mux16(a=x, b=zeroX, sel=zx, out=XAfterZX);
+    // negates x
+    Not16(in=XAfterZX, out=notXAfterZX);
+    // 'nx' checkpoint (zx output or negated zx output)
+    Mux16(a=XAfterZX, b=notXAfterZX, sel=nx, out=XAfterNX);
+
+    // makes y zero
+    Not16(in=y, out=notY);
+    And16(a=y, b=notY, out=zeroY);
+    // 'zy' checkpoint (y or zeroed-y)
+    Mux16(a=y, b=zeroY, sel=zy, out=YAfterZY);
+    // negates y
+    Not16(in=YAfterZY, out=notYAfterZY);
+    // 'ny' checkpoint (zy output or negated zy output)
+    Mux16(a=YAfterZY, b=notYAfterZY, sel=ny, out=YAfterNY);
+
+    // calculate function outcomes
+    And16(a=XAfterNX, b=YAfterNY, out=xANDy);
+    Add16(a=XAfterNX, b=YAfterNY, out=xPLUSy);
+    // 'f' checkpoint (x+y or x&y)
+    Mux16(a=xANDy, b=xPLUSy, sel=f, out=XYAfterF);
+    // negates function outcome
+    Not16(in=XYAfterF, out=notXYAfterF);
+    // 'no' checkpoint (f or negated f)
+    Mux16(a=XYAfterF, b=notXYAfterF, sel=no, out=out, out[0..7]=outputHalf1, out[8..15]=outputHalf2, out[15]=ngControl);
+
+    // 'zr' output logic
+    Or8Way(in=outputHalf1, out=zrInput1);
+    Or8Way(in=outputHalf2, out=zrInput2);
+    Or(a=zrInput1, b=zrInput2, out=isOutputPositive);
+    Not(in=isOutputPositive, out=zr);
+
+    // 'ng' output logic
+    And(a=ngControl, b=ngControl, out=ng);
+
+
 }
