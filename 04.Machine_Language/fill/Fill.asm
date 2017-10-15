@@ -48,6 +48,8 @@
 	D;JNE			//if key is pressed, jump to KEY_DOWN section else continue
 	@KEY_UP			
 	D;JEQ			//if no key is pressed, jump to KEY_UP section, else continue
+	@LISTEN_TO_KBD
+	0;JMP
 
 (KEY_DOWN)
 	@screen_state
@@ -93,7 +95,6 @@
 	@FILL_SCREEN_LOOP
 	0;JMP			//jump back to beginning of this loop
 
-
-
-
-
+(END)
+	@END
+	0;JMP
