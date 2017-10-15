@@ -10,17 +10,20 @@
 //	a=R0		//3
 //	b=R1		//4
 //	sum=a		//3		
-//	for(i=1; i<=b; i++){
+//	for(i=1; i<b; i++){
 //		sum += a;
 //		i += 1
 //	}
+	@R2
+	M=0		//reset RAM[2] to 0
+
 	@R0
 	D=M
 	@a
 	M=D		//init a
-
+	
 	@sum
-	M=D		//init sum
+	M=0		//init sum
 	
 	@R1
 	D=M
@@ -35,13 +38,11 @@
 	@i
 	D=D-M
 	@STOP
-	D;JLE	//if b-i <= 0, then jump to STOP
-
+	D;JLT	//if b-i < 0, then jump to STOP
 	@a
 	D=M
 	@sum
 	M=M+D	//add a to sum
-
 	@i
 	M=M+1	//increment i by 1
 	@LOOP
@@ -54,3 +55,4 @@
 (END)
 	@END
 	0;JMP
+
