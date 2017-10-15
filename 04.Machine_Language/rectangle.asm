@@ -6,12 +6,10 @@
 // ====== pseudo code ====
 //	height = RAM[0]
 //	i = 0
-//	offset = 0
-// 	increment_by = 32
-//	arr = SCREEN
-//	for(i=0; i<=height; i++){
-//		SCREEN[offset] = -1
-//		offset += increment_by
+//	addr = SCREEN
+//	for(i=0; i<height; i++){
+//		SCREEN[addr] = -1
+//		addr += 32		//32 because every next row starts by offset of +32 registers
 //	}
 
 	@R0
@@ -20,42 +18,31 @@
 	M=D		//initialize height, which basically is row amount to draw
 	
 	@i
-	M=0 	//initialize i counter
+	M=0 	//initialize i counter to keep track of iterations
 
-	@offset
-	M=0		//initialize address offset to 0
-
-	@32
-	D=A
-	@increment_by
-	M=D		//initialize increment_by to 32, because next row starts after 31 registers
-	
 	@SCREEN //base address of screen
 	D=A
-	@arr
-	M=D		//assign base address of screen to arr variable
+	@addr
+	M=D		//assign base address of screen to addr variable
 (LOOP)
 	@i		//if condition
 	D=M
 	@height
 	D=D-M
 	@END
-	D;JGT //if i > height, jump to end
+	D;JGT 	//if i > height, jump to end
 
-	@arr	//get base address
-	D=M
-	@offset	//get current counter value
-	D=D+M	//add base and counter to get the new address
-	A=D		//assign the new address
-	M=-1	//set the whole register to -1, so 1 row lights up
+	@addr	//get current row address
+	A=M		//select current row address
+	M=-1	//set the whole register to -1, so the row lights up
 	
-	@increment_by
-	D=M
-	@offset
-	M=M+D	//increment offset by 32
+	@32		//next row starts at +32 registers
+	D=A
+	@addr
+	M=M+D	//increment current screen address by 32 (to get next row)
 
 	@i
-	M=M+1	//increment counter
+	M=M+1	//increment loop's counter
 
 	@LOOP
 	0;JMP	//jump to beginning of loop
