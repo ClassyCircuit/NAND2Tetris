@@ -8,16 +8,16 @@ NAND2Tetris project
 |02			| Complete | 
 |03			| Complete | 
 |04			| Complete| 
-|05			| In-progress| 
-|06			|           | 
+|**05**			| **In-progress**| 
+|06			|Not yet started| 
 
 
 ## Part 2 - software
 |**Chapter**|**Status**|
 |:---------:|----------|
-|07			|          | 
-|08			|          | 
-|09			|          | 
-|10			|          | 
-|11			|          | 
-|12			|          | 
+|07			|Not yet started| 
+|08			|Not yet started| 
+|09			|Not yet started| 
+|10			|Not yet started| 
+|11			|Not yet started| 
+|12			|Not yet started| 
