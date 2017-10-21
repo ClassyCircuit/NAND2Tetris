@@ -39,5 +39,55 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    //C instruction connected to ALU
+    Not16(in=instruction, out=notInstruction);
+    And16(a=instruction, b=notInstruction, out=instrZeroed); //Zeroes
+    Mux16(a=instrZeroed, b=instruction, sel=instruction[15], out[0..2]=jumpBits,
+                                                             out[3]=writeM, 
+                                                             out[4]=d2,
+                                                             out[5]=d1,
+                                                             out[6]=c6,
+                                                             out[7]=c5,
+                                                             out[8]=c4,
+                                                             out[9]=c3,
+                                                             out[10]=c2,
+                                                             out[11]=c1,
+                                                             out[12]=aBit); //Mux before C_instruction splitter
+
+    //A_register
+    Mux16(a=instruction, b=ALUout, sel=instruction[15], out=instrMuxALU); //Mux before A_register
+    Not(in=instruction[15], out=notOpCode); //Not before OR gate, only active if A_instruction is sent
+    Or(a=d1, b=notOpCode, out=AInstrOrALUout); // OR before A_register (A_instruction sent or d1=1 in C_Instruction)
+    ARegister(in=instrMuxALU, load=AInstrOrALUout, out=AregisterOut, out[0..14]=addressM); // A_register
+
+    //D_register
+    DRegister(in=ALUout, load=d2, out=DregisterOut); // D_register
+    
+    //ALU connections
+    Mux16(a=AregisterOut, b=inM, sel=aBit, out=aMUXmRegister); //Mux before Y input in ALU. Choose between A and M register.
+    ALU(x=DregisterOut, y=aMUXmRegister,
+        zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6,
+        out=outM, out=ALUout,
+        zr=ALUzr, ng=ALUng);
+
+    //Program Counter (PC)
+    Not(in=jumpMUX, out=notJump);
+    PC(in=AregisterOut, load=jumpMUX, inc=notJump, reset=reset, out[0..14]=pc);
+
+    //JUMP logic
+    Not(in=ALUzr, out=notALUzr);
+    Not(in=ALUng, out=notALUng);
+    And(a=notALUzr, b=notALUng, out=notZRandNotNG);
+    Or(a=notZRandNotNG, b=ALUzr, out=JGE);
+    Or(a=ALUzr, b=ALUng, out=JLE);
+    Mux8Way(a=false,            //null (no jump)
+              b=notZRandNotNG,  //JGT
+              c=ALUzr,           //JEQ
+              d=JGE,              //JGE
+              e=ALUng,           //JLT
+              f=notALUzr,       //JNE
+              g=JLE,              //JLE
+              h=true,             //JMP (unconditional jump)
+              sel=jumpBits, out=jumpMUX);
 }
+

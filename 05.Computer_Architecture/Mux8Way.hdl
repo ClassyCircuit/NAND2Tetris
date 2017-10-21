@@ -1,0 +1,20 @@
+//Mux8Way
+
+CHIP Mux8Way{
+
+	IN a,b,c,d,e,f,g,h,
+	   sel[3];
+	OUT out;
+
+	PARTS:
+	Mux(a=a, b=b, sel=sel[0], out=aMUXb);
+	Mux(a=c, b=d, sel=sel[0], out=cMUXd);
+	Mux(a=e, b=f, sel=sel[0], out=eMUXf);
+	Mux(a=g, b=h, sel=sel[0], out=gMUXh);
+	
+	Mux(a=aMUXb, b=cMUXd, sel=sel[1], out=abMUXcd);
+	Mux(a=eMUXf, b=gMUXh, sel=sel[1], out=efMUXgh);
+	
+	Mux(a=abMUXcd, b=efMUXgh, sel=sel[2], out=out);
+
+}
